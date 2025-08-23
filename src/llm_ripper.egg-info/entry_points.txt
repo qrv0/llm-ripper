@@ -1,0 +1,2 @@
+[console_scripts]
+llm-ripper = llm_ripper.cli:main

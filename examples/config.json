@@ -1,0 +1,38 @@
+{
+  "donor_model_name": "example-donor-model",
+  "target_model_name": "example-target-model",
+  "model_cache_dir": "./models",
+  "device": "auto",
+  
+  "knowledge_bank_dir": "./knowledge_bank",
+  "corpus_dir": "./corpus",
+  "output_dir": "./output",
+  "hdf5_compression": "gzip",
+  
+  "batch_size": 8,
+  "max_sequence_length": 512,
+  "use_safetensors": true,
+  "capture_all_layers": true,
+  
+  "pca_components": 50,
+  "clustering_algorithm": "kmeans",
+  "n_clusters": 10,
+  "similarity_threshold": 0.8,
+  
+  "adapter_hidden_size": 64,
+  "freeze_donor_weights": true,
+  "learning_rate": 1e-4,
+  "num_epochs": 3,
+  
+  "validation_datasets": ["cola", "stsb", "mnli"],
+  "validation_batch_size": 16,
+  "num_validation_samples": 1000,
+  
+  "log_level": "INFO",
+  "wandb_project": "llm-ripper",
+  "save_checkpoints": true,
+  
+  "num_workers": 4,
+  "pin_memory": true,
+  "mixed_precision": true
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "source_component": "layer_5_attention",
+    "target_layer": 3,
+    "bridge_hidden_size": 64,
+    "freeze_donor": true,
+    "freeze_target": false,
+    "strategy": "module_injection"
+  },
+  {
+    "source_component": "layer_8_ffn",
+    "target_layer": 6,
+    "bridge_hidden_size": 128,
+    "freeze_donor": true,
+    "freeze_target": false,
+    "strategy": "module_injection"
+  },
+  {
+    "source_component": "embeddings",
+    "target_layer": 0,
+    "bridge_hidden_size": 32,
+    "freeze_donor": true,
+    "freeze_target": false,
+    "strategy": "embedding_init"
+  }
+]
