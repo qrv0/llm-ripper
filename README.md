@@ -171,5 +171,3 @@ Licensed under the Apache License, Version 2.0. See LICENSE file for details.
 - Ensure proper licensing and permissions for any models used
 - Verify compatibility with their specific use cases and requirements
 - Follow all applicable terms of service for model providers
-# LLM-Ripper
-# LLM-Ripper
