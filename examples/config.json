@@ -1,6 +1,5 @@
 {
-  "donor_model_name": "example-donor-model",
-  "target_model_name": "example-target-model",
+  
   "model_cache_dir": "./models",
   "device": "auto",
   

@@ -4,6 +4,9 @@ import os
 import json
 from typing import Dict, Any, Optional
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+from pathlib import Path
 
 
 class ConfigManager:
@@ -15,10 +18,16 @@ class ConfigManager:
     
     def _load_config(self) -> Dict[str, Any]:
         """Load configuration from file or environment variables."""
+        # Load .env if present
+        env_path = Path(self.config_path).parent if self.config_path else Path('.')
+        dot_env = env_path / '.env'
+        if dot_env.exists():
+            load_dotenv(dotenv_path=dot_env)
         config = {
             # Model Configuration
-            "donor_model_name": os.getenv("DONOR_MODEL_NAME", "example-donor-model"),
-            "target_model_name": os.getenv("TARGET_MODEL_NAME", "example-target-model"),
+            # Require explicit model identifiers (no defaults)
+            "donor_model_name": os.getenv("DONOR_MODEL_NAME"),
+            "target_model_name": os.getenv("TARGET_MODEL_NAME"),
             "model_cache_dir": os.getenv("MODEL_CACHE_DIR", "./models"),
             "device": os.getenv("DEVICE", "auto"),  # auto|cuda|cpu|mps
             
@@ -116,6 +125,12 @@ class ConfigManager:
         
         for key in required_keys:
             if not self.get(key):
+                # Provide actionable guidance for missing model names
+                if key in ("donor_model_name", "target_model_name"):
+                    raise ValueError(
+                        f"Config '{key}' ausente. Defina via arquivo de config ou variáveis de ambiente: "
+                        f"DONOR_MODEL_NAME e TARGET_MODEL_NAME. Valores vazios não são aceitos."
+                    )
                 raise ValueError(f"Required configuration key '{key}' is missing or empty")
         
         # Validate numeric values

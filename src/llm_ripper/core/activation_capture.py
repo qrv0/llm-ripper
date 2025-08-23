@@ -8,7 +8,10 @@ activation extraction during model inference.
 import torch
 import torch.nn as nn
 from torch.fx import symbolic_trace, Node
-from torchvision.models.feature_extraction import create_feature_extractor
+try:
+    from torchvision.models.feature_extraction import create_feature_extractor  # type: ignore
+except Exception:  # torchvision may be absent; we'll fallback to hooks
+    create_feature_extractor = None  # type: ignore
 import h5py
 import json
 import logging
@@ -162,13 +165,14 @@ class ActivationCapture:
     
     def _create_feature_extractor(self, model: nn.Module, return_nodes: List[str]) -> nn.Module:
         """Create a feature extractor using torch.fx."""
-        try:
-            # Use torchvision's feature extractor which handles torch.fx internally
-            return create_feature_extractor(model, return_nodes=return_nodes)
-        except Exception as e:
-            logger.warning(f"Failed to create torch.fx feature extractor: {e}")
-            # Fallback to hook-based extraction
-            return self._create_hook_based_extractor(model, return_nodes)
+        if create_feature_extractor is not None:
+            try:
+                # Use torchvision's feature extractor which handles torch.fx internally
+                return create_feature_extractor(model, return_nodes=return_nodes)
+            except Exception as e:
+                logger.warning(f"Failed to create torch.fx feature extractor: {e}")
+        # Fallback to hook-based extraction
+        return self._create_hook_based_extractor(model, return_nodes)
     
     def _create_hook_based_extractor(self, model: nn.Module, return_nodes: List[str]) -> nn.Module:
         """Fallback hook-based feature extractor."""

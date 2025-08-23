@@ -389,24 +389,69 @@ class KnowledgeTransplanter:
         """
         logger.info("Transplanting with AdapterFusion...")
         
-        # This is a simplified implementation
-        # Full AdapterFusion would require multiple donor modules and fusion layers
-        
-        # For now, implement as module injection with additional fusion layer
+        # Inject the primary module as usual
         module_result = self._transplant_module(
             target_model, target_config, knowledge_bank_path, transplant_config
         )
         
-        # Add fusion layer (placeholder)
-        fusion_layer = nn.Linear(target_config.get("hidden_size", 768), target_config.get("hidden_size", 768))
+        # Implement a simple gated fusion across all transplanted modules at the target layer
+        hidden_size = target_config.get("hidden_size", 768)
         
-        if not hasattr(target_model, 'adapter_fusion_layers'):
-            target_model.adapter_fusion_layers = nn.ModuleList()
+        class AdapterFusionGate(nn.Module):
+            def __init__(self, hidden_size: int, num_adapters: int):
+                super().__init__()
+                self.query = nn.Linear(hidden_size, hidden_size)
+                self.keys = nn.ModuleList([nn.Linear(hidden_size, hidden_size) for _ in range(num_adapters)])
+                self.values = nn.ModuleList([nn.Linear(hidden_size, hidden_size) for _ in range(num_adapters)])
+                self.out = nn.Linear(hidden_size, hidden_size)
+                self.scale = hidden_size ** -0.5
+            def forward(self, h: torch.Tensor, adapters_out: List[torch.Tensor]) -> torch.Tensor:
+                q = self.query(h)
+                # Compute attention weights over adapters
+                scores = []
+                for i, a in enumerate(adapters_out):
+                    k = self.keys[i](a)
+                    s = (q * k).sum(dim=-1, keepdim=True) * self.scale
+                    scores.append(s)
+                attn = torch.softmax(torch.cat(scores, dim=-1), dim=-1)  # [B, T, N]
+                fused = 0.0
+                for i, a in enumerate(adapters_out):
+                    v = self.values[i](a)
+                    w = attn[..., i:i+1]
+                    fused = fused + w * v
+                return self.out(fused)
         
-        target_model.adapter_fusion_layers.append(fusion_layer)
+        # Collect transplanted modules for this layer
+        layer_key = f"layer_{transplant_config.target_layer}"
+        if not hasattr(target_model, 'transplanted_modules') or layer_key not in target_model.transplanted_modules:
+            return module_result
+        
+        # Attach fusion gate
+        adapters = [target_model.transplanted_modules[layer_key]]
+        fusion_gate = AdapterFusionGate(hidden_size, len(adapters))
+        
+        # Register a hook to fuse outputs at this layer
+        target_layer_module = self._get_target_layer(target_model, transplant_config.target_layer)
+        
+        def _fusion_hook(module, inputs, output):
+            base_out = output[0] if isinstance(output, (tuple, list)) else output
+            x = inputs[0] if isinstance(inputs, (tuple, list)) and len(inputs) > 0 else base_out
+            adapters_out = [adp(x) for adp in adapters]
+            fused = fusion_gate(base_out, adapters_out)
+            return fused
+        
+        if not hasattr(target_model, 'adapter_fusion_hooks'):
+            target_model.adapter_fusion_hooks = {}
+        # Remove existing hook if present
+        if layer_key in target_model.adapter_fusion_hooks:
+            try:
+                target_model.adapter_fusion_hooks[layer_key].remove()
+            except Exception:
+                pass
+        target_model.adapter_fusion_hooks[layer_key] = target_layer_module.register_forward_hook(_fusion_hook)
         
         module_result["strategy"] = "adapter_fusion"
-        module_result["fusion_layer_added"] = True
+        module_result["fusion_gate"] = True
         
         return module_result
     
@@ -599,26 +644,69 @@ class KnowledgeTransplanter:
         target_layer: nn.Module,
         transplant_config: TransplantConfig
     ) -> Tuple[Optional[BridgeNetwork], Optional[BridgeNetwork]]:
-        """Create bridge networks for dimensional compatibility."""
-        
-        # This is a simplified implementation
-        # In practice, you'd need to analyze the actual input/output dimensions
-        
-        # For demonstration, assume we need bridges
-        bridge_hidden_size = transplant_config.bridge_hidden_size
-        
-        input_bridge = BridgeNetwork(
-            input_dim=768,  # Target model hidden size
-            output_dim=768,  # Donor module expected input
-            hidden_dim=bridge_hidden_size
-        )
-        
-        output_bridge = BridgeNetwork(
-            input_dim=768,  # Donor module output
-            output_dim=768,  # Target model expected size
-            hidden_dim=bridge_hidden_size
-        )
-        
+        """Create bridge networks for dimensional compatibility.
+        Infere dimensões reais do módulo doador e do modelo alvo.
+        """
+        # Infer target hidden size
+        target_hidden = getattr(getattr(target_layer, 'config', object()), 'hidden_size', None)
+        if target_hidden is None:
+            target_hidden = getattr(getattr(target_layer, 'self_attn', object()), 'hidden_size', None)
+        if target_hidden is None:
+            target_hidden = getattr(getattr(target_layer, 'mlp', object()), 'hidden_size', None)
+        if target_hidden is None:
+            target_hidden = getattr(getattr(target_layer, 'dense', object()), 'out_features', None)
+        # Fallback to model-level config if available
+        if target_hidden is None:
+            target_hidden = getattr(getattr(target_layer, 'parent', object()), 'config', object())
+        # Try model.config.hidden_size via the module tree
+        try:
+            # walk up modules to find a .config
+            m = target_layer
+            while m is not None and not hasattr(m, 'config'):
+                m = getattr(m, 'parent', None)
+            if m is not None and hasattr(m.config, 'hidden_size'):
+                target_hidden = getattr(m.config, 'hidden_size')
+        except Exception:
+            pass
+        if target_hidden is None:
+            target_hidden = 768  # conservative default
+
+        # Infer donor input/output dims
+        donor_in = None
+        donor_out = None
+        for attr in ('q_proj', 'gate_proj', 'in_proj', 'fc1', 'w1'):
+            if hasattr(donor_module, attr) and hasattr(getattr(donor_module, attr), 'in_features'):
+                donor_in = getattr(getattr(donor_module, attr), 'in_features')
+                break
+        for attr in ('o_proj', 'down_proj', 'out_proj', 'fc2', 'w2'):
+            if hasattr(donor_module, attr) and hasattr(getattr(donor_module, attr), 'out_features'):
+                donor_out = getattr(getattr(donor_module, attr), 'out_features')
+                break
+        # Fallbacks if linear layers not found
+        if donor_in is None or donor_out is None:
+            if hasattr(donor_module, 'hidden_size'):
+                donor_in = donor_in or donor_module.hidden_size
+                donor_out = donor_out or donor_module.hidden_size
+            else:
+                donor_in = donor_in or target_hidden
+                donor_out = donor_out or target_hidden
+
+        # Create bridges only if needed
+        input_bridge = None
+        output_bridge = None
+        if donor_in != target_hidden:
+            input_bridge = BridgeNetwork(
+                input_dim=target_hidden,
+                output_dim=donor_in,
+                hidden_dim=transplant_config.bridge_hidden_size
+            )
+        if donor_out != target_hidden:
+            output_bridge = BridgeNetwork(
+                input_dim=donor_out,
+                output_dim=target_hidden,
+                hidden_dim=transplant_config.bridge_hidden_size
+            )
+
         return input_bridge, output_bridge
     
     def _inject_module(
@@ -634,3 +722,40 @@ class KnowledgeTransplanter:
             target_model.transplanted_modules = nn.ModuleDict()
         
         target_model.transplanted_modules[f"layer_{target_layer}"] = transplanted_module
+        
+        # Register a forward hook on the target layer to compose outputs via a learnable gate
+        class _FusionGate(nn.Module):
+            def __init__(self, hidden_size: int):
+                super().__init__()
+                self.alpha = nn.Parameter(torch.zeros(1))
+                self.hidden_size = hidden_size
+            def forward(self, base_out: torch.Tensor, transplanted_out: torch.Tensor) -> torch.Tensor:
+                gate = torch.sigmoid(self.alpha)
+                return base_out + gate * transplanted_out
+        
+        if not hasattr(target_model, 'transplant_fusion_gates'):
+            target_model.transplant_fusion_gates = nn.ModuleDict()
+        hidden_size = getattr(getattr(target_model, 'config', object()), 'hidden_size', 768)
+        fusion_gate = _FusionGate(hidden_size)
+        target_model.transplant_fusion_gates[f"layer_{target_layer}"] = fusion_gate
+        target_layer_module = self._get_target_layer(target_model, target_layer)
+        
+        def _hook(module, inputs, output):
+            try:
+                base_out = output[0] if isinstance(output, (tuple, list)) else output
+                if isinstance(base_out, dict) and 'last_hidden_state' in base_out:
+                    base_out = base_out['last_hidden_state']
+                x = inputs[0] if isinstance(inputs, (tuple, list)) and len(inputs) > 0 else base_out
+                transplanted_out = transplanted_module(x)
+                return fusion_gate(base_out, transplanted_out)
+            except Exception:
+                return output
+        
+        if not hasattr(target_model, 'transplant_hooks'):
+            target_model.transplant_hooks = {}
+        if f"layer_{target_layer}" in target_model.transplant_hooks:
+            try:
+                target_model.transplant_hooks[f"layer_{target_layer}"].remove()
+            except Exception:
+                pass
+        target_model.transplant_hooks[f"layer_{target_layer}"] = target_layer_module.register_forward_hook(_hook)

@@ -17,5 +17,6 @@ tokenizers>=0.13.0
 scipy>=1.10.0
 pandas>=2.0.0
 wandb>=0.15.0
+python-dotenv>=1.0.1
 nltk>=3.8.0
 spacy>=3.6.0

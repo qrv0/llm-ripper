@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
 """
-Complete pipeline example for LLM Ripper.
+Pipeline completo de uso do LLM Ripper.
 
-⚠️  IMPORTANT: This is an EXAMPLE script for demonstration purposes only.
-    All model names used are placeholders. You MUST:
-    - Replace example model names with your actual model identifiers
-    - Ensure you have proper licensing and permissions for any models used
-    - Verify compatibility with your specific use cases
+Este script executa o fluxo ponta a ponta:
+1. Extração de conhecimento do modelo doador
+2. Captura de ativações em um corpus
+3. Análise dos componentes extraídos
+4. Transplante dos componentes ao modelo alvo
+5. Validação do modelo transplantado
 
-This script demonstrates the full workflow:
-1. Extract knowledge from a donor model
-2. Capture activations on a corpus  
-3. Analyze extracted components
-4. Transplant components to a target model
-5. Validate the transplanted model
+Observação: nomes de modelos não são definidos aqui por intenção do projeto.
+Forneça-os via arquivo de configuração ou variáveis de ambiente
+(`DONOR_MODEL_NAME`, `TARGET_MODEL_NAME`).
 """
 
 import os
@@ -24,7 +22,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from llm_ripper.utils.config import ConfigManager
-from llm_ripper.core.extraction import KnowledgeExtractor, ActivationCapture
+from llm_ripper.core.extraction import KnowledgeExtractor
+from llm_ripper.core.activation_capture import ActivationCapture
 from llm_ripper.core.analysis import KnowledgeAnalyzer
 from llm_ripper.core.transplant import KnowledgeTransplanter, TransplantConfig
 from llm_ripper.core.validation import ValidationSuite
@@ -34,7 +33,7 @@ from llm_ripper.utils.data_manager import DataManager
 def main():
     """Run the complete LLM Ripper pipeline."""
     
-    print("🧠 LLM Ripper Complete Pipeline Example")
+    print("🧠 LLM Ripper - Pipeline Completo")
     print("=" * 50)
     
     # Load configuration
@@ -52,11 +51,11 @@ def main():
     
     # Step 1: Extract knowledge from donor model
     print("\n1️⃣  Extracting knowledge from donor model...")
-    donor_model = config.get("donor_model_name")  # EXAMPLE: Replace with actual model name
-    knowledge_bank_dir = "./example_knowledge_bank"
+    donor_model = config.get("donor_model_name")
+    knowledge_bank_dir = config.get("knowledge_bank_dir")
     
     extraction_result = extractor.extract_model_components(
-        model_name=donor_model,  # EXAMPLE: Use your actual donor model here
+        model_name=donor_model,
         output_dir=knowledge_bank_dir,
         components=["embeddings", "attention_heads", "ffn_layers", "lm_head"]
     )
@@ -66,10 +65,10 @@ def main():
     # Step 2: Capture activations
     print("\n2️⃣  Capturing activations...")
     corpus = data_manager.load_probing_corpus("diverse")
-    activations_file = "./example_activations.h5"
+    activations_file = str(Path(config.get("output_dir")) / "activations.h5")
     
     capture_result = capture.capture_model_activations(
-        model_name=donor_model,  # EXAMPLE: Same donor model as above
+        model_name=donor_model,
         corpus_dataset=corpus,
         output_file=activations_file,
         max_samples=50  # Small number for example
@@ -79,7 +78,7 @@ def main():
     
     # Step 3: Analyze extracted components
     print("\n3️⃣  Analyzing extracted components...")
-    analysis_dir = "./example_analysis"
+    analysis_dir = str(Path(config.get("output_dir")) / "analysis")
     
     analysis_result = analyzer.analyze_knowledge_bank(
         knowledge_bank_dir=knowledge_bank_dir,
@@ -91,8 +90,8 @@ def main():
     
     # Step 4: Transplant components
     print("\n4️⃣  Transplanting components to target model...")
-    target_model = config.get("target_model_name")  # EXAMPLE: Replace with actual target model
-    transplant_dir = "./example_transplanted"
+    target_model = config.get("target_model_name")
+    transplant_dir = str(Path(config.get("output_dir")) / "transplanted")
     
     # Define transplant configurations
     transplant_configs = [
@@ -116,7 +115,7 @@ def main():
     
     transplant_result = transplanter.transplant_knowledge(
         source_knowledge_bank=knowledge_bank_dir,
-        target_model_name=target_model,  # EXAMPLE: Use your actual target model here
+        target_model_name=target_model,
         transplant_configs=transplant_configs,
         output_dir=transplant_dir
     )
@@ -125,11 +124,11 @@ def main():
     
     # Step 5: Validate transplanted model
     print("\n5️⃣  Validating transplanted model...")
-    validation_dir = "./example_validation"
+    validation_dir = str(Path(config.get("output_dir")) / "validation")
     
     validation_result = validator.validate_transplanted_model(
         transplanted_model_path=transplant_dir,
-        baseline_model_name=target_model,  # EXAMPLE: Compare against target model
+        baseline_model_name=target_model,
         benchmarks=["intrinsic", "pos_tagging", "semantic_similarity"],
         output_dir=validation_dir
     )
