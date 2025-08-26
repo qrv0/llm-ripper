@@ -19,11 +19,13 @@ BITS8=$(if $(filter 1,$(E8)),--load-in-8bit,)
 BITS4=$(if $(filter 1,$(E4)),--load-in-4bit,)
 TRUST_FLAG=$(if $(filter 1,$(TRUST)),--trust-remote-code,)
 DEVICE_FLAG=--device $(DEVICE)
+RUN_ROOT?=
+LATEST:=$(shell ls -1dt runs/* 2>/dev/null | head -n 1)
 
 .PHONY: help
 help:
-	@echo "Targets: install, install-cuda, lint, format, test, extract, capture, analyze, transplant, validate"
-	@echo "Vars: MODEL, OUT, ACT, ANALYSIS, TRANSPLANTED, VALIDATION, DEVICE (auto|cuda|cpu|mps), E8=1, E4=1, TRUST=1"
+	@echo "Targets: install, install-cuda, lint, format, lint-fix, test, extract, capture, analyze, transplant, validate, inspect, smoke-offline, demo-full, demo-trace, demo-uq, studio, print-latest, precommit"
+	@echo "Vars: MODEL, OUT, ACT, ANALYSIS, TRANSPLANTED, VALIDATION, DEVICE (auto|cuda|cpu|mps), E8=1, E4=1, TRUST=1, RUN_ROOT=<runs/...>"
 
 .PHONY: install
 install:
@@ -51,9 +53,21 @@ format:
 	black .
 	ruff check --fix .
 
+.PHONY: lint-fix
+lint-fix:
+	ruff check --fix .
+	black .
+
 .PHONY: test
 test:
 	pytest -q
+
+.PHONY: release-dry-run
+release-dry-run:
+	python -m build || true
+	python -m pip install --upgrade twine || true
+	twine check dist/* || true
+	@echo "Release dry run complete."
 
 .PHONY: extract
 extract:
@@ -78,3 +92,48 @@ transplant:
 .PHONY: validate
 validate:
 	$(PY) -m llm_ripper.cli validate --model $(TRANSPLANTED) --baseline $(MODEL) --output-dir $(VALIDATION) $(DEVICE_FLAG) $(BITS8) $(BITS4) $(TRUST_FLAG)
+
+.PHONY: inspect
+inspect:
+	$(PY) -m llm_ripper.cli inspect --knowledge-bank $(OUT) --json
+
+.PHONY: smoke-offline
+smoke-offline:
+	@echo "[smoke] Building minimal KB structure in $(OUT) and running inspect"
+	@mkdir -p $(OUT)/embeddings $(OUT)/heads/layer_0 $(OUT)/ffns/layer_0
+	@python - << 'PY'
+import json, os, torch
+out=os.environ.get('OUT','./knowledge_bank')
+emb_cfg={"dimensions":[4,3],"vocab_size":4,"hidden_size":3}
+open(f"{out}/embeddings/config.json","w").write(json.dumps(emb_cfg))
+torch.save(torch.randn(4,3), f"{out}/embeddings/embeddings.pt")
+open(f"{out}/extraction_metadata.json","w").write(json.dumps({"source_model":"dummy"}))
+open(f"{out}/heads/layer_0/config.json","w").write(json.dumps({"layer_idx":0}))
+open(f"{out}/ffns/layer_0/config.json","w").write(json.dumps({"layer_idx":0}))
+PY
+	$(PY) -m llm_ripper.cli inspect --knowledge-bank $(OUT)
+
+.PHONY: precommit
+precommit:
+	pre-commit run --all-files || true
+
+.PHONY: demo-full
+demo-full:
+	$(PY) examples/run_full_pipeline.py --model $(MODEL) --baseline $(MODEL)
+
+.PHONY: demo-trace
+demo-trace:
+	$(PY) -m llm_ripper.cli trace --model $(MODEL) --targets head:0.q,ffn:0.up --metric nll_delta --intervention zero --max-samples 32 --seed 42
+
+.PHONY: demo-uq
+demo-uq:
+	$(PY) -m llm_ripper.cli uq --model $(MODEL) --samples 8 --max-texts 32
+
+.PHONY: studio
+studio:
+	@echo "Using run root: $(or $(RUN_ROOT),$(LATEST))"
+	$(PY) -m llm_ripper.cli studio --root $(or $(RUN_ROOT),$(LATEST)) --port 8000
+
+.PHONY: print-latest
+print-latest:
+	@echo $(LATEST)

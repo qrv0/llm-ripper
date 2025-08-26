@@ -9,7 +9,7 @@ from .validation import ValidationSuite
 __all__ = [
     "KnowledgeExtractor",
     "ActivationCapture",
-    "KnowledgeAnalyzer", 
+    "KnowledgeAnalyzer",
     "KnowledgeTransplanter",
-    "ValidationSuite"
+    "ValidationSuite",
 ]

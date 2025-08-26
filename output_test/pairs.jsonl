@@ -1,0 +1,5 @@
+{"id": "agr-0", "task": "agreement", "original": "The cat is on the table.", "counterfactual": "The cat are on the table.", "target_tokens": ["is", "are"], "controls": {"subject_number": "sg"}}
+{"id": "agr-1", "task": "agreement", "original": "The student runs in the park.", "counterfactual": "The student run in the park.", "target_tokens": ["runs", "run"], "controls": {"subject_number": "sg"}}
+{"id": "agr-2", "task": "agreement", "original": "The company jumps very interesting.", "counterfactual": "The company jump very interesting.", "target_tokens": ["jumps", "jump"], "controls": {"subject_number": "sg"}}
+{"id": "agr-3", "task": "agreement", "original": "This book seems ready.", "counterfactual": "This book seem ready.", "target_tokens": ["seems", "seem"], "controls": {"subject_number": "sg"}}
+{"id": "agr-4", "task": "agreement", "original": "A bird appears outside.", "counterfactual": "A bird appear outside.", "target_tokens": ["appears", "appear"], "controls": {"subject_number": "sg"}}

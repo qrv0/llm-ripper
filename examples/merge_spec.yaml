@@ -1,0 +1,10 @@
+# Example merge spec with optional microtransplants
+models:
+  - ./models/modelA
+  - ./models/modelB
+base_dir: ./models/modelA
+micro:
+  - knowledge_bank: ./knowledge_bank
+    source_component: embeddings
+    target_layer: 0
+    strategy: embedding_init
