@@ -1,7 +1,5 @@
 # LLM Ripper
 
-[![CI](https://github.com/your-org/llm-ripper/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/llm-ripper/actions/workflows/ci.yml)
-
 A production-ready framework for modular deconstruction, analysis, and recomposition of knowledge in Transformer-based language models.
 
 ## Overview
@@ -76,11 +74,14 @@ llm-ripper reattach --transplanted-dir ./transplanted --offline --json
 
 ```mermaid
 flowchart TD
+  %% Donor & Knowledge
   A[Donor Model] -->|extract| KB[Knowledge Bank]
   A -->|capture| ACT[Activations (HDF5)]
   KB -->|analyze| ANALYSIS[Analysis & Catalog]
 
+  %% Interop & Bridges
   subgraph Interop & Bridges
+    direction TB
     MERGE[merge --global]:::op
     ADAPT[adapters --import/--fuse]:::op
     TOK[tokenize-align]:::op
@@ -94,8 +95,12 @@ flowchart TD
   MRGD --> TRANS[Transplanted Model]
   KB -->|transplant| TRANS
   ADAPT --> TRANS
+  ALIGN --> BTRAIN
+  BTRAIN --> TRANS
 
+  %% Causal & Evaluation
   subgraph Causal & Evaluation
+    direction TB
     T[trace]:::op
     CFGEN[cfgen]:::op
     CFEVAL[cfeval]:::op
@@ -111,7 +116,9 @@ flowchart TD
   TRANS -->|uq| UQ
   UQ --> ROUTE
 
+  %% Safety & Reporting
   subgraph Safety & Reporting
+    direction TB
     PROV[provenance]:::op
     STRESS[stress]:::op
     REPORT[report (JSON/MD/PDF)]:::op
@@ -134,7 +141,7 @@ flowchart TD
 ```mermaid
 sequenceDiagram
   autonumber
-  participant H as Hidden state h
+  participant H as Hidden state<br/>h
   participant IB as InputBridge
   participant DM as DonorModule
   participant OB as OutputBridge
@@ -142,22 +149,27 @@ sequenceDiagram
   participant G as FusionGate
   participant Y as Layer Output
 
-  H->>IB: project if dims mismatch
+  H->>IB: project<br/>(if dims mismatch)
   IB-->>DM: h'
   DM->>OB: donor forward
   OB-->>G: transplanted_out
   H->>BASE: base forward
   BASE-->>G: base_out
-  G-->>Y: fused_out (learned gate)
+  G-->>Y: fused_out<br/>(learned gate)
 ```
 
 ### Strategy Decision Flow
 
 ```mermaid
 flowchart TD
+  %% Entrada
   S([Start]) --> A{Aligned donor→target?\n(cos↑, MSE↓)}
-  A -- No --> BA[Run bridge-align]\n--> A
+
+  %% Alinhamento
+  A -- No --> BA[Run bridge-align] --> A
   A -- Yes --> T{High Δ-impact targets?\n(trace)}
+
+  %% Injeção e Transferência
   T -- Yes --> INJ[Module injection + bridges]
   T -- No --> V{Need vocab/semantics transfer?}
   V -- Yes --> EMB[Embedding initialization]
@@ -167,13 +179,15 @@ flowchart TD
   L -- Yes --> AF[Adapter Fusion]
   L -- No --> VAL[Validate + UQ]
 
+  %% Caminhos para Validação
   INJ --> VAL
   EMB --> VAL
   MOB --> VAL
   AF  --> VAL
 
-  VAL --> CF[Counterfactuals (cfgen/cfeval)]
-  VAL --> UQ[UQ + route-sim (τ)]
+  %% Saídas de Validação
+  VAL --> CF[Counterfactuals\n(cfgen / cfeval)]
+  VAL --> UQ[Uncertainty + route-sim (τ)]
   UQ  --> REP[Report + Studio]
   CF  --> REP
 ```
