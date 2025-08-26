@@ -70,73 +70,6 @@ llm-ripper inspect --knowledge-bank ./knowledge_bank
 llm-ripper reattach --transplanted-dir ./transplanted --offline --json
 ```
 
-### Architecture Diagram
-
-```mermaid
-flowchart TD
-  %% Donor & Knowledge
-  A[Donor Model] -->|extract| KB[Knowledge Bank]
-  A -->|capture| ACT[Activations (HDF5)]
-  KB -->|analyze| ANALYSIS[Analysis & Catalog]
-
-  %% Interop & Bridges
-  subgraph interop [Interop & Bridges]
-    direction TB
-    MERGE[merge --global]:::op
-    ADAPT[adapters --import/--fuse]:::op
-    TOK[tokenize-align]:::op
-    ALIGN[bridge-align]:::op
-    BTRAIN[bridge-train --mixture]:::op
-  end
-
-  ANALYSIS --> ALIGN
-  KB --> ALIGN
-  TOK --> ALIGN
-  MERGE --> MRGD[Merged Model]
-  MRGD --> TRANS[Transplanted Model]
-  KB -->|transplant| TRANS
-  ADAPT --> TRANS
-  ALIGN --> BTRAIN
-  BTRAIN --> TRANS
-
-  %% Causal & Evaluation
-  subgraph eval [Causal & Evaluation]
-    direction TB
-    T[trace]:::op
-    CFGEN[cfgen]:::op
-    CFEVAL[cfeval]:::op
-    UQ[uq]:::op
-    ROUTE[route-sim]:::op
-  end
-
-  ANALYSIS --> T
-  A --> T
-  CFGEN --> CFEVAL
-  A --> CFEVAL
-  TRANS -->|validate --mechanistic| VAL[Validation]
-  TRANS -->|uq| UQ
-  UQ --> ROUTE
-
-  %% Safety & Reporting
-  subgraph report [Safety & Reporting]
-    direction TB
-    PROV[provenance]:::op
-    STRESS[stress]:::op
-    REPORT[report (JSON/MD/PDF)]:::op
-    STUDIO[Studio MVP]:::op
-  end
-
-  TRANS --> PROV
-  TRANS --> STRESS
-  VAL --> REPORT
-  UQ --> REPORT
-  PROV --> REPORT
-  STRESS --> REPORT
-  REPORT --> STUDIO
-
-  classDef op fill:#eef,stroke:#446,stroke-width:1px;
-```
-
 ### Transplant Injection Flow
 
 ```mermaid
@@ -157,35 +90,6 @@ sequenceDiagram
   H->>BASE: base forward
   BASE-->>G: base_out
   G-->>Y: fused_out (learned gate)
-```
-
-### Strategy Decision Flow
-
-```mermaid
-flowchart TD
-  S([Start]) --> A{Aligned donor->target?<br/>(cos up, MSE down)}
-  A -->|No| BA[Run bridge-align]
-  BA --> A
-  A -->|Yes| T{High delta-impact targets?<br/>(trace)}
-  T -->|Yes| INJ[Module injection + bridges]
-  T -->|No| V{Need vocab/semantics transfer?}
-  V -->|Yes| EMB[Embedding initialization]
-  V -->|No| H{Heterogeneous tasks?}
-  H -->|Yes| MOB[Mixture-of-bridges training]
-  H -->|No| L{Multiple candidates per layer?}
-  L -->|Yes| AF[Adapter Fusion]
-  L -->|No| VAL[Validate + UQ]
-
-  INJ --> VAL
-  EMB --> VAL
-  MOB --> VAL
-  AF  --> VAL
-
-  VAL --> CF[Counterfactuals (cfgen/cfeval)]
-  VAL --> UQ[UQ + route-sim (tau)]
-  UQ  --> REP[Report + Studio]
-  CF  --> REP
-
 ```
 
 #### Decision Node Examples
