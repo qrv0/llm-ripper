@@ -1,0 +1,20 @@
+site_name: LLM Ripper
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - Quickstart: quickstart.md
+  - Guides:
+    - Transplant Strategies: guides/transplant_strategies.md
+    - Validation: guides/validation.md
+    - Causal Tracing: guides/causal_tracing.md
+    - UQ & Routing: guides/uq_routing.md
+    - Interoperability: guides/interop.md
+    - Safety & Reporting: guides/safety_reporting.md
+    - End-to-End Pipeline: guides/end_to_end.md
+repo_url: https://github.com/your-org/llm-ripper
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true

@@ -20,3 +20,4 @@ wandb>=0.15.0
 python-dotenv>=1.0.1
 nltk>=3.8.0
 spacy>=3.6.0
+PyYAML>=6.0

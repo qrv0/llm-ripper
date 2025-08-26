@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["source_model", "analysis_config", "component_analysis", "head_catalog"],
+  "properties": {
+    "source_model": {"type": "string"},
+    "analysis_config": {"type": "object"},
+    "component_analysis": {
+      "type": "object",
+      "properties": {
+        "embeddings": {
+          "type": "object",
+          "properties": {
+            "metrics": {
+              "type": "object",
+              "required": ["perplexity_score", "semantic_coverage", "dimension_analysis"],
+              "properties": {
+                "perplexity_score": {"type": "number", "minimum": 0},
+                "semantic_coverage": {"type": "number", "minimum": 0, "maximum": 1},
+                "dimension_analysis": {
+                  "type": "object",
+                  "properties": {
+                    "effective_dim": {"type": "integer", "minimum": 1}
+                  },
+                  "additionalProperties": true
+                }
+              },
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": true
+        },
+        "attention_heads": {"type": "object"},
+        "ffn_layers": {"type": "object"}
+      },
+      "additionalProperties": true
+    },
+    "head_catalog": {
+      "type": "array",
+      "items": {"type": "object"}
+    }
+  },
+  "additionalProperties": true
+}
