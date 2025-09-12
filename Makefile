@@ -158,6 +158,10 @@ beginner:
 	$(PY) examples/beginner_quickstart.py
 	$(MAKE) studio
 
+.PHONY: quickstart
+quickstart:
+	$(PY) -m llm_ripper.cli quickstart --open
+
 .PHONY: print-latest
 print-latest:
 	@echo $(LATEST)

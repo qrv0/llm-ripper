@@ -136,6 +136,10 @@ llm-ripper quickstart --open
 - Standardized run layout under `runs/<timestamp>/` with directories:
   - `knowledge_bank`, `activations`, `analysis`, `transplants`, `validation`, `causal`, `traces`, `counterfactuals`, `uq`, `catalog`, `provenance`, `reports`.
 
+## Studio
+
+![Studio Screenshot](docs/assets/studio_placeholder.svg)
+
 ## Architecture
 
 See the docs page [Architecture](docs/architecture.md). High-level view:

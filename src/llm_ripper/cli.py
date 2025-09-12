@@ -1592,6 +1592,7 @@ def main():
         args.func(args)
     except Exception as e:
         logging.error("✗ Error: %s", e)
+        logging.info("Tip: if you are just getting started, try: llm-ripper quickstart --open")
         sys.exit(1)
 
 
