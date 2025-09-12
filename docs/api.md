@@ -1,13 +1,17 @@
 # API Reference
 
-::: llm_ripper.core.extraction
+Documentation for the LLM Ripper API will be available soon.
 
-::: llm_ripper.core.validation
+## Core Modules
 
-::: llm_ripper.core.analysis
+- **extraction**: Model component extraction utilities
+- **validation**: Model validation and testing utilities  
+- **analysis**: Analysis and reporting tools
+- **transplant**: Component transplantation utilities
 
-::: llm_ripper.core.transplant
+## Utils
 
-::: llm_ripper.utils.run
+- **run**: Runtime context and execution utilities
+- **model_loader**: Model loading and configuration utilities
 
-::: llm_ripper.utils.model_loader
+*Auto-generated API documentation coming soon.*

@@ -20,6 +20,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install mkdocs-material mkdocstrings[python]
           pip install -r requirements.txt
+          pip install -e .
       - name: Deploy to GitHub Pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
