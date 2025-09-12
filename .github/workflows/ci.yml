@@ -53,7 +53,9 @@ jobs:
           pip install mkdocs-material
       - name: Install doc plugins
         run: |
-          pip install mkdocs-material mkdocstrings[python]\n          pip install -r requirements.txt\n          pip install -e .
+          pip install mkdocs-material mkdocstrings[python]
+          pip install -r requirements.txt
+          pip install -e .
       - name: Build docs
         run: |
           mkdocs build --strict

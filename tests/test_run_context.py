@@ -31,5 +31,5 @@ def test_run_context_creates_dirs_and_writes(tmp_path: Path):
     # JSONL write is atomic and has correct rows
     p_jsonl = rc.write_jsonl("traces/summary.jsonl", [{"a": 1}, {"a": 2}])
     assert p_jsonl.exists()
-    lines = [json.loads(l) for l in p_jsonl.read_text(encoding="utf-8").splitlines()]
+    lines = [json.loads(line) for line in p_jsonl.read_text(encoding="utf-8").splitlines()]
     assert lines == [{"a": 1}, {"a": 2}]
