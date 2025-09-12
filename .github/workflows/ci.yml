@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          pip install -e .
+      - name: Lint (ruff)
+        run: |
+          ruff --version
+          ruff .
+      - name: Type-check (mypy)
+        run: |
+          mypy --version
+          mypy .
+      - name: Tests (pytest + coverage)
+        run: |
+          pytest --cov=src --cov-report=xml -q
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          fail_ci_if_error: false
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install mkdocs
+        run: |
+          pip install mkdocs-material
+      - name: Install doc plugins
+        run: |
+          pip install mkdocs-material mkdocstrings[python]\n          pip install -r requirements.txt\n          pip install -e .
+      - name: Build docs
+        run: |
+          mkdocs build --strict

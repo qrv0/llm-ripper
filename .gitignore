@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+*.pyo
+*.pyd
+*.so
+
+# Environments
+.venv/
+.env
+
+# Build & dist
+build/
+dist/
+site/
+.coverage
+htmlcov/
+
+# Editors/OS
+.vscode/
+.idea/
+.DS_Store
+
+# Project artifacts
+runs/
+*.h5
+*.hdf5
+*.pt
+*.bin
+*.safetensors

@@ -24,7 +24,7 @@ LATEST:=$(shell ls -1dt runs/* 2>/dev/null | head -n 1)
 
 .PHONY: help
 help:
-	@echo "Targets: install, install-cuda, lint, format, lint-fix, test, extract, capture, analyze, transplant, validate, inspect, smoke-offline, demo-full, demo-trace, demo-uq, studio, print-latest, precommit"
+	@echo "Targets: install, install-cuda, lint, format, lint-fix, test, test-cov, docs-build, docs-serve, extract, capture, analyze, transplant, validate, inspect, smoke-offline, demo-full, demo-trace, demo-uq, studio, print-latest, precommit"
 	@echo "Vars: MODEL, OUT, ACT, ANALYSIS, TRANSPLANTED, VALIDATION, DEVICE (auto|cuda|cpu|mps), E8=1, E4=1, TRUST=1, RUN_ROOT=<runs/...>"
 
 .PHONY: install
@@ -35,6 +35,13 @@ install:
 .PHONY: install-dev
 install-dev: install
 	$(PIP) install -r requirements-dev.txt
+	pre-commit install || true
+
+.PHONY: dev-setup
+dev-setup:
+	$(PIP) install -r requirements.txt
+	$(PIP) install -r requirements-dev.txt
+	$(PIP) install -e .
 	pre-commit install || true
 
 # Adjust the CUDA version as needed
@@ -53,6 +60,14 @@ format:
 	black .
 	ruff check --fix .
 
+.PHONY: docs-build
+docs-build:
+	mkdocs build --strict
+
+.PHONY: docs-serve
+docs-serve:
+	mkdocs serve -a 0.0.0.0:8000
+
 .PHONY: lint-fix
 lint-fix:
 	ruff check --fix .
@@ -61,6 +76,10 @@ lint-fix:
 .PHONY: test
 test:
 	pytest -q
+
+.PHONY: test-cov
+test-cov:
+	pytest --cov=src --cov-report=term-missing -q
 
 .PHONY: release-dry-run
 release-dry-run:
@@ -132,7 +151,12 @@ demo-uq:
 .PHONY: studio
 studio:
 	@echo "Using run root: $(or $(RUN_ROOT),$(LATEST))"
-	$(PY) -m llm_ripper.cli studio --root $(or $(RUN_ROOT),$(LATEST)) --port 8000
+	$(PY) -m llm_ripper.cli studio --root $(or $(RUN_ROOT),$(LATEST)) --port $(or $(PORT),8000)
+
+.PHONY: beginner
+beginner:
+	$(PY) examples/beginner_quickstart.py
+	$(MAKE) studio
 
 .PHONY: print-latest
 print-latest:
