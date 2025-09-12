@@ -6,10 +6,18 @@ __pycache__/
 *.pyo
 *.pyd
 *.so
+*.pyc
 
-# Environments
+# Virtual environments
 .venv/
+venv/
+env/
+ENV/
+
+# Environment variables
 .env
+.env.local
+.env.*.local
 
 # Build & dist
 build/
@@ -17,11 +25,21 @@ dist/
 site/
 .coverage
 htmlcov/
+.pytest_cache/
+.tox/
 
 # Editors/OS
 .vscode/
 .idea/
 .DS_Store
+*.swp
+*.swo
+*~
+Thumbs.db
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
 
 # Project artifacts
 runs/
@@ -30,3 +48,28 @@ runs/
 *.pt
 *.bin
 *.safetensors
+*.log
+
+# Documentation
+docs/_build/
+site/
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini

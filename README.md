@@ -4,6 +4,10 @@
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://qrv0.github.io/LLM-Ripper)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![codecov](https://codecov.io/gh/qrv0/LLM-Ripper/branch/main/graph/badge.svg)](https://codecov.io/gh/qrv0/LLM-Ripper)
+[![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+[![PyPI](https://img.shields.io/badge/PyPI-coming%20soon-orange.svg)](https://pypi.org/)
+[![Stars](https://img.shields.io/github/stars/qrv0/LLM-Ripper?style=social)](https://github.com/qrv0/LLM-Ripper/stargazers)
+[![Forks](https://img.shields.io/github/forks/qrv0/LLM-Ripper?style=social)](https://github.com/qrv0/LLM-Ripper/network/members)
 
 A production-oriented framework for modular deconstruction, analysis, and recomposition of knowledge in Transformer-based language models.
 
