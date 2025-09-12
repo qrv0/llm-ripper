@@ -154,6 +154,10 @@ flowchart LR
   E --> H[Studio]
 ```
 
+## Maintainers
+
+See the Maintainers guide for enabling Pages, Codecov and PyPI: [docs/maintainers.md](docs/maintainers.md)
+
 ## Development
 
 See `CONTRIBUTING.md`.

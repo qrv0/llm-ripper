@@ -1094,7 +1094,7 @@ Examples:
         (
             print(json.dumps(out, indent=2))
             if args.json
-            else print(
+            else logging.info(
                 f"✓ Trace completed. Run: {res.run_id}\n  summary: {res.summary_path}\n  traces: {res.traces_path}"
             )
         )
@@ -1115,7 +1115,7 @@ Examples:
         (
             print(json.dumps({"pairs_file": fp}, indent=2))
             if args.json
-            else print(f"✓ Generated pairs: {fp}")
+            else logging.info(f"✓ Generated pairs: {fp}")
         )
 
     cfgen_parser.set_defaults(func=_cfgen_cmd)
@@ -1144,7 +1144,7 @@ Examples:
         (
             print(json.dumps(res, indent=2))
             if args.json
-            else print(
+            else logging.info(
                 f"✓ Evaluated pairs. {res['summary']}. File: {res['results_file']}"
             )
         )
@@ -1186,7 +1186,7 @@ Examples:
         (
             print(json.dumps(res, indent=2))
             if args.json
-            else print(f"✓ UQ completed. Summary: {res['summary_file']}")
+            else logging.info(f"✓ UQ completed. Summary: {res['summary_file']}")
         )
 
     uq_parser.set_defaults(func=_uq_cmd)
@@ -1218,7 +1218,7 @@ Examples:
         (
             print(json.dumps(res, indent=2))
             if args.json
-            else print(
+            else logging.info(
                 f"✓ Alignment saved: {res['matrix_file']} (cos {res['cosine_before']:.3f}->{res['cosine_after']:.3f})"
             )
         )
@@ -1247,7 +1247,7 @@ Examples:
         (
             print(json.dumps(res, indent=2))
             if args.json
-            else print(
+            else logging.info(
                 f"✓ Provenance scan ok={res.get('ok')} violations={res.get('violations')}"
             )
         )
@@ -1273,7 +1273,7 @@ Examples:
         (
             print(json.dumps(res, indent=2))
             if args.json
-            else print(f"✓ Catalog saved: {res['catalog_file']}")
+            else logging.info(f"✓ Catalog saved: {res['catalog_file']}")
         )
 
     feat_parser.set_defaults(func=_feat_cmd)
@@ -1326,7 +1326,7 @@ Examples:
         (
             print(_j.dumps(out, indent=2))
             if args.json
-            else print(f"✓ Routing simulated: {out}")
+            else logging.info(f"✓ Routing simulated: {out}")
         )
 
     route_parser.set_defaults(func=_route_cmd)
@@ -1361,7 +1361,7 @@ Examples:
         (
             print(json.dumps(res, indent=2))
             if args.json
-            else print(f"✓ Merged: {res['out']} with {res['merged_keys']} keys")
+            else logging.info(f"✓ Merged: {res['out']} with {res['merged_keys']} keys")
         )
 
     merge_parser.set_defaults(func=_merge_cmd)
@@ -1397,12 +1397,12 @@ Examples:
         else:
             if "import" in result:
                 r = result["import"]
-                print(
+                logging.info(
                     f"✓ Imported LoRA into layer {r['layer']} ({r['in']}->{r['out']})"
                 )
             if "fuse" in result:
                 r = result["fuse"]
-                print(f"✓ Fused {r['adapters']} adapters on layer {r['layer']}")
+                logging.info(f"✓ Fused {r['adapters']} adapters on layer {r['layer']}")
 
     adapters_parser.set_defaults(func=_adapters_cmd)
 
@@ -1422,7 +1422,7 @@ Examples:
         (
             print(json.dumps(res, indent=2))
             if args.json
-            else print(
+            else logging.info(
                 f"✓ Tokenizer overlap: {res['overlap']} (mapping: {res['mapping_file']})"
             )
         )
@@ -1447,7 +1447,7 @@ Examples:
         (
             print(json.dumps(res, indent=2))
             if args.json
-            else print(f"✓ Trained mixture on layer {args.layer}: {res}")
+            else logging.info(f"✓ Trained mixture on layer {args.layer}: {res}")
         )
 
     btrain.set_defaults(func=_btrain_cmd)
@@ -1496,7 +1496,7 @@ Examples:
         (
             print(json.dumps(res, indent=2))
             if args.json
-            else print(
+            else logging.info(
                 f"✓ Stress/Drift: PSI={res['psi_entropy']:.4f} KLm0={res['kl_model_vs_baseline']:.4f}"
             )
         )
