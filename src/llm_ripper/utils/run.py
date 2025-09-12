@@ -80,14 +80,18 @@ class RunContext:
     def write_json(self, relpath: str | Path, data: Dict[str, Any]) -> Path:
         path = self.root / relpath
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(data, indent=2, default=str))
+        tmp = path.with_suffix(path.suffix + ".tmp")
+        tmp.write_text(json.dumps(data, indent=2, default=str), encoding="utf-8")
+        tmp.replace(path)
         return path
 
     def write_jsonl(self, relpath: str | Path, rows: Iterable[Dict[str, Any]]) -> Path:
         path = self.root / relpath
         path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open("w", encoding="utf-8") as f:
+        tmp = path.with_suffix(path.suffix + ".tmp")
+        with tmp.open("w", encoding="utf-8") as f:
             for r in rows:
                 f.write(json.dumps(r, default=str))
                 f.write("\n")
+        tmp.replace(path)
         return path

@@ -4,6 +4,7 @@ theme:
 nav:
   - Home: index.md
   - Quickstart: quickstart.md
+  - Beginners: beginners.md
   - Guides:
     - Transplant Strategies: guides/transplant_strategies.md
     - Validation: guides/validation.md
@@ -12,9 +13,20 @@ nav:
     - Interoperability: guides/interop.md
     - Safety & Reporting: guides/safety_reporting.md
     - End-to-End Pipeline: guides/end_to_end.md
-repo_url: https://github.com/your-org/llm-ripper
+  - Architecture: architecture.md
+  - API: api.md
+repo_url: https://github.com/qrv0/LLM-Ripper
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: false
 markdown_extensions:
   - admonition
   - codehilite
+  - attr_list
+  - pymdownx.superfences
   - toc:
       permalink: true

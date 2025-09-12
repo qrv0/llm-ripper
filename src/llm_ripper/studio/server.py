@@ -4,6 +4,8 @@ import http.server
 import socketserver
 from pathlib import Path
 import json
+import logging
+from functools import partial
 
 
 HTML = """
@@ -66,14 +68,13 @@ def launch_studio(doc_root: str, port: int = 8000) -> None:
     index = studio_dir / "index.html"
     if not index.exists():
         index.write_text(HTML)
-    # Change working directory so SimpleHTTPRequestHandler serves from root
-    import os
-
-    os.chdir(str(root))
-    handler = http.server.SimpleHTTPRequestHandler
-    with socketserver.TCPServer(("", port), handler) as httpd:
+    # Serve from root directory without changing global CWD
+    handler_cls = partial(http.server.SimpleHTTPRequestHandler, directory=str(root))
+    with socketserver.TCPServer(("", port), handler_cls) as httpd:
         url = f"http://localhost:{port}/studio/index.html?root={root}"
-        print(f"Studio running at: {url}\nPress Ctrl+C to stop.")
+        logging.getLogger(__name__).info(
+            "Studio running at: %s\nPress Ctrl+C to stop.", url
+        )
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:

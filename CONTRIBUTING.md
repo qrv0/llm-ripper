@@ -2,25 +2,39 @@
 
 Thanks for your interest in contributing! Please follow these guidelines.
 
-## Getting started
-- Fork the repo and create your branch from `main`.
-- Ensure Python 3.8+.
-- Create a virtualenv and install dependencies: `pip install -r requirements.txt -e .`.
+## Development setup
 
-## Development workflow
-- Run linters and tests before submitting a PR.
-- Add/adjust unit tests for new features and bug fixes.
-- Update docs (README and examples) when behavior or interfaces change.
+- Python >= 3.8
+- Create and activate a virtualenv
+- Install dependencies and package in editable mode:
+  - pip install -r requirements.txt
+  - pip install -r requirements-dev.txt
+  - pip install -e .
+- Install pre-commit hooks:
+  - pre-commit install
+- Quality checks:
+  - make lint
+  - make test
+  - make test-cov
+- Optional: tox for multi-Python matrix:
+  - tox
 
-## Coding standards
-- Follow PEP8.
-- Type hints required for new/changed public APIs.
-- Prefer small, focused PRs.
+## Pull requests
 
-## Commit / PR checklist
-- [ ] Feature or bugfix has tests
-- [ ] Docs updated
-- [ ] CI passing
+- Keep PRs small and focused
+- Ensure CI passes (ruff, mypy, pytest, docs build)
+- Add/update tests with behavior changes
+- Update documentation where applicable
+- Prefer conventional commits: feat:, fix:, docs:, chore:
+
+## Code style
+
+- Ruff for linting, black/ruff-format for formatting
+- Mypy for type checking
+
+## Security
+
+- Be cautious with `--trust-remote-code`; preserve safety prompts and flags in model loading
 
 ## Reporting issues
 - Use GitHub Issues, include:
