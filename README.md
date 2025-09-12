@@ -142,7 +142,7 @@ llm-ripper quickstart --open
 
 ## Studio
 
-![Studio Screenshot](docs/assets/studio_placeholder.svg)
+*Studio interface screenshot will be added soon.*
 
 ## Architecture
 
