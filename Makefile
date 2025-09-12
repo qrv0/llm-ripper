@@ -120,16 +120,16 @@ inspect:
 smoke-offline:
 	@echo "[smoke] Building minimal KB structure in $(OUT) and running inspect"
 	@mkdir -p $(OUT)/embeddings $(OUT)/heads/layer_0 $(OUT)/ffns/layer_0
-	@python - << 'PY'
-import json, os, torch
-out=os.environ.get('OUT','./knowledge_bank')
-emb_cfg={"dimensions":[4,3],"vocab_size":4,"hidden_size":3}
-open(f"{out}/embeddings/config.json","w").write(json.dumps(emb_cfg))
-torch.save(torch.randn(4,3), f"{out}/embeddings/embeddings.pt")
-open(f"{out}/extraction_metadata.json","w").write(json.dumps({"source_model":"dummy"}))
-open(f"{out}/heads/layer_0/config.json","w").write(json.dumps({"layer_idx":0}))
-open(f"{out}/ffns/layer_0/config.json","w").write(json.dumps({"layer_idx":0}))
-PY
+	@echo 'import json, os, torch' > /tmp/smoke_setup.py
+	@echo 'out=os.environ.get("OUT","./knowledge_bank")' >> /tmp/smoke_setup.py
+	@echo 'emb_cfg={"dimensions":[4,3],"vocab_size":4,"hidden_size":3}' >> /tmp/smoke_setup.py
+	@echo 'open(f"{out}/embeddings/config.json","w").write(json.dumps(emb_cfg))' >> /tmp/smoke_setup.py
+	@echo 'torch.save(torch.randn(4,3), f"{out}/embeddings/embeddings.pt")' >> /tmp/smoke_setup.py
+	@echo 'open(f"{out}/extraction_metadata.json","w").write(json.dumps({"source_model":"dummy"}))' >> /tmp/smoke_setup.py
+	@echo 'open(f"{out}/heads/layer_0/config.json","w").write(json.dumps({"layer_idx":0}))' >> /tmp/smoke_setup.py
+	@echo 'open(f"{out}/ffns/layer_0/config.json","w").write(json.dumps({"layer_idx":0}))' >> /tmp/smoke_setup.py
+	@$(PY) /tmp/smoke_setup.py
+	@rm -f /tmp/smoke_setup.py
 	$(PY) -m llm_ripper.cli inspect --knowledge-bank $(OUT)
 
 .PHONY: precommit

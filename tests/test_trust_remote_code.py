@@ -4,7 +4,7 @@ import pytest
 from llm_ripper.cli import create_parser
 
 
-def test_trust_remote_code_requires_yes(monkeypatch, capsys):
+def test_trust_remote_code_requires_yes(monkeypatch, caplog):
     parser = create_parser()
     # Simulate: top-level command with a subcommand, here use 'extract' minimal args
     args = parser.parse_args(
@@ -19,5 +19,4 @@ def test_trust_remote_code_requires_yes(monkeypatch, capsys):
     with pytest.raises(SystemExit) as ex:
         apply_cli_overrides(cfg, args)
     assert ex.value.code == 1
-    captured = capsys.readouterr()
-    assert "requires confirmation" in captured.out
+    assert "requires confirmation" in caplog.text
