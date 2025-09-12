@@ -22,10 +22,18 @@ pre-commit install
 ```
 
 ## 2) Run the beginner demo (no downloads)
+
+Option A (Makefile):
 This creates a sample run folder with the files the Studio viewer expects.
 
 ```bash
 make beginner
+```
+
+Option B (CLI only):
+
+```bash
+llm-ripper quickstart --open
 ```
 
 The command will:

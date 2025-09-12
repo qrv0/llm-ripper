@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400">
+  <rect width="800" height="400" fill="#f0f0f0" stroke="#cccccc" />
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="24" fill="#666">
+    Studio Screenshot Placeholder
+  </text>
+</svg>

@@ -5,6 +5,7 @@ nav:
   - Home: index.md
   - Quickstart: quickstart.md
   - Beginners: beginners.md
+  - Maintainers: maintainers.md
   - Guides:
     - Transplant Strategies: guides/transplant_strategies.md
     - Validation: guides/validation.md
