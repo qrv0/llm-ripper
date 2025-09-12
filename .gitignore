@@ -30,3 +30,5 @@ runs/
 *.pt
 *.bin
 *.safetensors
+*.log
+knowledge_bank/
