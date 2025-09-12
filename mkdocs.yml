@@ -1,12 +1,43 @@
 site_name: LLM Ripper
+site_description: Production framework for modular deconstruction, analysis, and recomposition of knowledge in Transformer-based language models
+site_author: qrv0
+site_url: https://qrv0.github.io/LLM-Ripper
+
 theme:
   name: material
+  palette:
+    - scheme: default
+      primary: blue
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: blue
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.select
+  icon:
+    repo: fontawesome/brands/github
 nav:
   - Home: index.md
-  - Quickstart: quickstart.md
-  - Beginners: beginners.md
-  - Maintainers: maintainers.md
-  - Guides:
+  - Getting Started:
+    - Quick Install: quickstart.md  
+    - Beginners Guide: beginners.md
+    - For Maintainers: maintainers.md
+  - User Guide:
     - Transplant Strategies: guides/transplant_strategies.md
     - Validation: guides/validation.md
     - Causal Tracing: guides/causal_tracing.md
@@ -14,20 +45,52 @@ nav:
     - Interoperability: guides/interop.md
     - Safety & Reporting: guides/safety_reporting.md
     - End-to-End Pipeline: guides/end_to_end.md
-  - Architecture: architecture.md
-  - API: api.md
+  - Reference:
+    - Architecture: architecture.md
+    - API Documentation: api.md
 repo_url: https://github.com/qrv0/LLM-Ripper
+repo_name: qrv0/LLM-Ripper
+edit_uri: edit/main/docs/
+
 plugins:
-  - search
+  - search:
+      lang: en
   - mkdocstrings:
       handlers:
         python:
           options:
             show_source: false
+            docstring_style: google
+            merge_init_into_class: true
+            show_submodules: false
+
 markdown_extensions:
   - admonition
-  - codehilite
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
   - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/qrv0/LLM-Ripper
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/llm-ripper/
+  analytics:
+    provider: google
+    property: # Add your GA4 property ID here if needed
   - pymdownx.superfences
   - toc:
       permalink: true
