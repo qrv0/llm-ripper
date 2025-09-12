@@ -6,4 +6,4 @@ pytest-cov==5.0.0
 pre-commit==3.7.0
 tox==4.16.0
 mkdocs-material==9.5.31
-mkdocstrings[python]==0.26.2
+mkdocstrings[python]==0.30.0
