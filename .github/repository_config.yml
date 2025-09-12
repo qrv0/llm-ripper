@@ -1,0 +1,39 @@
+# Repository Description
+description: "A production-oriented framework for modular deconstruction, analysis, and recomposition of knowledge in Transformer-based language models."
+
+# Topics (GitHub tags)
+topics:
+  - machine-learning
+  - transformers
+  - llm
+  - pytorch
+  - nlp
+  - knowledge-extraction
+  - model-analysis
+  - deep-learning
+  - artificial-intelligence
+  - python
+
+# Homepage
+homepage: "https://qrv0.github.io/LLM-Ripper"
+
+# Issues and Discussions
+has_issues: true
+has_discussions: true
+has_wiki: false
+has_projects: true
+
+# Default branch
+default_branch: main
+
+# Merge options
+allow_squash_merge: true
+allow_merge_commit: false
+allow_rebase_merge: true
+delete_branch_on_merge: true
+
+# Branch protection (manual setup needed)
+# Protect main branch with:
+# - Require pull request reviews
+# - Require status checks to pass before merging
+# - Require linear history
