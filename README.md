@@ -1,50 +1,92 @@
 # LLM Ripper
 
 [![CI](https://github.com/qrv0/LLM-Ripper/actions/workflows/ci.yml/badge.svg)](https://github.com/qrv0/LLM-Ripper/actions/workflows/ci.yml)
-[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://qrv0.github.io/LLM-Ripper)
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![codecov](https://codecov.io/gh/qrv0/LLM-Ripper/branch/main/graph/badge.svg)](https://codecov.io/gh/qrv0/LLM-Ripper)
+[![PyPI version](https://badge.fury.io/py/llm-ripper.svg)](https://badge.fury.io/py/llm-ripper)
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/llm-ripper)](https://pypi.org/project/llm-ripper/)
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
-[![PyPI](https://img.shields.io/badge/PyPI-coming%20soon-orange.svg)](https://pypi.org/)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://qrv0.github.io/LLM-Ripper)
+[![codecov](https://codecov.io/gh/qrv0/LLM-Ripper/branch/main/graph/badge.svg)](https://codecov.io/gh/qrv0/LLM-Ripper)
 [![Stars](https://img.shields.io/github/stars/qrv0/LLM-Ripper?style=social)](https://github.com/qrv0/LLM-Ripper/stargazers)
 [![Forks](https://img.shields.io/github/forks/qrv0/LLM-Ripper?style=social)](https://github.com/qrv0/LLM-Ripper/network/members)
 
 A production-oriented framework for modular deconstruction, analysis, and recomposition of knowledge in Transformer-based language models.
 
-- Extract interpretable components from LLMs (embeddings, heads, FFNs)
-- Analyze and catalog attention/MLP behaviors
-- Transplant knowledge across models with safety gates
-- Validate outcomes with quantitative checks and reports
+🎉 **Now available on PyPI!** Install with `pip install llm-ripper`
 
-## Table of contents
-- Features
-- Installation
-- Quickstart
-- CLI overview
-- Examples
-- Configuration
-- Architecture
-- Development
-- Troubleshooting
-- License
+### Key Features
 
-## Features
-- Modular pipeline: capture → analyze → extract → transplant → validate
-- Safe model loading with explicit `--trust-remote-code` flow
-- Reproducible runs with standardized artifact layout (see RunContext)
-- Studio (static) viewer for quick inspection of outputs
-- Interop utilities for adapters and merges
+- 🔬 **Extract** interpretable components from LLMs (embeddings, heads, FFNs)
+- 📊 **Analyze** and catalog attention/MLP behaviors
+- 🔄 **Transplant** knowledge across models with safety gates
+- ✅ **Validate** outcomes with quantitative checks and reports
+- 🛡️ **Safe** model loading with explicit `--trust-remote-code` flow
+- 🔄 **Reproducible** runs with standardized artifact layout
+- 👀 **Studio** viewer for quick inspection of outputs
+
+## Table of Contents
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [CLI Overview](#cli-overview)
+- [Examples](#examples)
+- [Configuration](#configuration)
+- [Architecture](#architecture)
+- [Development](#development)
+- [Troubleshooting](#troubleshooting)
+- [License](#license)
+
+## Pipeline Overview
+
+**Modular pipeline:** capture → analyze → extract → transplant → validate
+
+- 🔄 **Reproducible runs** with standardized artifact layout (see RunContext)
+- 🔧 **Interop utilities** for adapters and merges
 
 ## Installation
 
+### 🚀 Quick Install from PyPI
+
 ```bash
-pip install -r requirements.txt
-pip install -e .  # editable install for development
-# Optional extras
-# pip install .[viz]
-# pip install .[spacy]
-# pip install .[wandb]
-# pip install .[nlp]
+pip install llm-ripper
+```
+
+### 🔧 Development Install
+
+```bash
+git clone https://github.com/qrv0/LLM-Ripper.git
+cd LLM-Ripper
+pip install -e .
+```
+
+### 📦 Optional Dependencies
+
+```bash
+# For visualization features
+pip install llm-ripper[viz]
+
+# For spaCy integration
+pip install llm-ripper[spacy]
+
+# For Weights & Biases logging
+pip install llm-ripper[wandb]
+
+# For NLP utilities
+pip install llm-ripper[nlp]
+
+# Install all extras
+pip install llm-ripper[viz,spacy,wandb,nlp]
+```
+
+### 🎯 Quick Start
+
+After installation, verify everything works:
+
+```bash
+# Check CLI is working
+llm-ripper --help
+
+# Run a simple test
+python -c "import llm_ripper; print('✅ LLM-Ripper installed successfully!')"
 ```
 
 GPU users: see `make install-cuda` to install a CUDA-enabled torch build.
