@@ -1,5 +1,5 @@
 black==25.9.0
-ruff==0.5.0
+ruff==0.13.2
 mypy==1.18.2
 pytest==8.2.0
 pytest-cov==5.0.0
